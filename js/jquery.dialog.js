@@ -1,3 +1,8 @@
+/**
+ *  BC_Dialog
+ *  @author     beatacao <beatacao@gmail.com>
+ *  @version    1.0
+ */
 (function(window){
 
     window.BC_Dialog = window.BC_Dialog || {};
@@ -9,7 +14,7 @@
 
         plugin = this;
         
-        /*
+        /**
         * @params
         * @dropback         boolean 是否需要遮罩层;
         * @need_close       boolean 是否需要关闭按钮;
@@ -104,7 +109,7 @@
 
             //error, success,warning和info类型的dialog有共同点，添加共同的class名：d-alert;
             if((/^\s*(error|success|warning|info)\s*$/).test(ps.dialog_type)){
-                pClass += ' d-alert';
+                pClass += ' d-alert ' +ps.dialog_type;
             }else if((/^\s*(confirm|alert)\s*$/).test(ps.dialog_type)){
                 pClass += ' d-confirm';
             }else{
