@@ -10,8 +10,8 @@ Dialog对话框插件
 </p>
 <h5>如何使用：</h5>
 <ol>
-    <li>引入default.css</li>
-    <li>引入最新jquery库及dialog.js</li>
+    <li>引入default.min.css</li>
+    <li>引入最新jquery库及jquery.dialog.min.js</li>
     <li>
         var Dialog = new BC_Dialog({设置的参数...});<br/>
         Dialog.open();  //打开Dialog<br/>
