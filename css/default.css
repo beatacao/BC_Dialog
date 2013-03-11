@@ -12,7 +12,6 @@
 }
 
 .dialog {
-  display:none;
   position: fixed;
   _position:absolute; 
   z-index: 1050;
