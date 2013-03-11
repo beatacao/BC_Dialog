@@ -245,7 +245,7 @@
                 button.bind('click', function(){
                     //如果用户设置了按钮的回调函数，调用回调函数
                     if(value.callback != undefined && whatType(value.callback) == '[object function]'){
-                        value.callback(plugin.dialog);
+                        value.callback(plugin);
                     } 
                     //关闭对话框
                     //var self = $(this).closest('.dialog');
@@ -328,134 +328,149 @@
 
     /*定位*/
     var setPosition = function(){
-        var 
-            //外围元素
-            wrapper = (Object.Equals(plugin.settings.wrapper, $('body'))) ? $(window) : plugin.settings.wrapper,
-            //dialog元素
-            dialog = plugin.dialog,
-
-            //外围元素的宽和高
-            wrapperWidth = wrapper.width(),
-            wrapperHeight = wrapper.height(),
-
-            //dialog的宽和高
-            dialogWidth = dialog.width(),
-            dialogHeight = dialog.height(),
-
-            //定义左中右，上中下的值
-            values = {
-                left: 0,
-                top: 0,
-                right: wrapperWidth - dialogWidth,
-                bottom: wrapperHeight - dialogHeight,
-                center: (wrapperWidth - dialogWidth)/2,
-                middle: (wrapperHeight - dialogHeight)/2
-            },
-
-            //获取用户设置的position
+        var //获取用户设置的position
             position = plugin.settings.position;
 
-        //初始化dialog居上和居左变量
-        plugin.dialog_left = undefined;
-        plugin.dialog_top = undefined;
-
-        if($.isArray(position)){
+        if(//以外围元素为基准定位dialog
+            !position.trigger){
             var 
-                //获取position数组的第一个元素,将转换为dialog的left定位
-                p0 = position[0],
-                //获取position数组的第二个元素,将转换为dialog的top定位
-                p1 = position[1],
-                //匹配类似 20，'20' 或 '20px'的正则，支持前后有空格
-                p_number = /^\s*\d+(\s|px)*$/i;
-                //验证left定位的正则,支持在left、right、center基础上加减数值
-                p0_expression = /^\s*(left|right|center)\s*([\+\-]{1}\s*\d+\s*)*$/i;
-                //验证top定位的正则，支持在top、bottom、middle基础上加减数值
-                p1_expression = /^\s*(top|bottom|middle)\s*([\+\-]{1}\s*\d+\s*)*$/i;
+                //外围元素
+                wrapper = (Object.Equals(plugin.settings.wrapper, $('body'))) ? $(window) : plugin.settings.wrapper,
+                //dialog元素
+                dialog = plugin.dialog,
 
-            //计算left定位
-            if(p_number.test(p0)){
-                //如果为数值、数值字符串或数值字符串+'px',取数值部分
-                plugin.dialog_left = parseInt(p0);
-            }else if(p0_expression.test(p0)){
-                //如果匹配成功，根据values对象替换left,right,center为对应的数值
-                $.each(values, function(index, value){
+                //外围元素的宽和高
+                wrapperWidth = wrapper.width(),
+                wrapperHeight = wrapper.height(),
 
-                    var tmp1 = p0.replace(index, value);
+                //dialog的宽和高
+                dialogWidth = dialog.width(),
+                dialogHeight = dialog.height(),
 
-                    //如果替换成功，结果赋值给plugin.dialog_left
-                    if(tmp1 != p0){
-                        plugin.dialog_left = tmp1;
-                    }
-                })
-            }
+                //定义左中右，上中下的值
+                values = {
+                    left: 0,
+                    top: 0,
+                    right: wrapperWidth - dialogWidth,
+                    bottom: wrapperHeight - dialogHeight,
+                    center: (wrapperWidth - dialogWidth)/2,
+                    middle: (wrapperHeight - dialogHeight)/2
+                };
 
-            //计算top定位
-            if(p_number.test(p1)){
-                //如果为数值、数值字符串或数值字符串+'px',取数值部分
-                plugin.dialog_top = parseInt(p1);
-            }else if(p1_expression.test(p1)){
-                //如果匹配成功，根据values对象替换left,right,center为对应的数值
-                $.each(values, function(index, value){
+            //初始化dialog居上和居左变量
+            plugin.dialog_left = undefined;
+            plugin.dialog_top = undefined;
 
-                    var tmp2 = p1.replace(index, value);
+            if($.isArray(position)){
+                var 
+                    //获取position数组的第一个元素,将转换为dialog的left定位
+                    p0 = position[0],
+                    //获取position数组的第二个元素,将转换为dialog的top定位
+                    p1 = position[1],
+                    //匹配类似 20，'20' 或 '20px'的正则，支持前后有空格
+                    p_number = /^\s*\d+(\.\d)*(\s|px)*$/i;
+                    //验证left定位的正则,支持在left、right、center基础上加减数值
+                    p0_expression = /^\s*(left|right|center)\s*([\+\-]{1}\s*\d+\s*)*$/i;
+                    //验证top定位的正则，支持在top、bottom、middle基础上加减数值
+                    p1_expression = /^\s*(top|bottom|middle)\s*([\+\-]{1}\s*\d+\s*)*$/i;
 
-                    //如果替换成功，结果赋值给plugin.dialog_top
-                    if(tmp2 != p1){
-                        plugin.dialog_top = tmp2;
-                    }
-                })
-            }
-        }
+                //计算left定位
+                if(p_number.test(p0)){
+                    //如果为数值、数值字符串或数值字符串+'px',取数值部分
+                    plugin.dialog_left = parseInt(p0);
+                }else if(p0_expression.test(p0)){
+                    //如果匹配成功，根据values对象替换left,right,center为对应的数值
+                    $.each(values, function(index, value){
 
-        //如果用户设置不符合规范或用户没有设置定位，水平定位默认为values.center对应的值; 垂直定位默认为values.middle对应的值
-        plugin.dialog_left = (plugin.dialog_left != undefined)? eval(plugin.dialog_left) : values.center;
-        plugin.dialog_top = (plugin.dialog_top != undefined)? eval(plugin.dialog_top) : values.middle;
+                        var tmp1 = p0.replace(index, value);
 
-        //判断是否为ie6. 如果是ie6,将为dialog及遮罩层做定位的兼容性
-        plugin.isIE6 = ($.browser.msie && parseInt($.browser.version, 10) == 6) || false;
-
-        if(plugin.isIE6){
-            var 
-                //获取window宽度,ie6 遮罩层100%不能正确获取window宽度兼容
-                width = $(window).width(),
-                //获取window高度,ie6 遮罩层100%不能正确获取window高度兼容
-                height = $(window).height(),
-                //获取窗口水平滚动距离,兼容ie6 position:fixed定位
-                scrollLeft = $(window).scrollLeft(),
-                //获取窗口垂直滚动距离,兼容ie6 position:fixed定位
-                scrollTop = $(window).scrollTop();
-
-            //ie6下的通过position:absolute；模拟fixed定位。正常水平或垂直距离+滚动距离
-            var ie_dialog_left = plugin.dialog_left + scrollLeft;
-            var ie_dialog_top = plugin.dialog_top + scrollTop;
-
-            //如果有遮罩层，遮罩层定位
-            if(plugin.settings.dropback){
-                plugin.backDrop.css({width:width, height:height, left:scrollLeft, top:scrollTop});
-            }
-
-            //dialog定位
-            plugin.dialog.css({left: ie_dialog_left + 'px', top: ie_dialog_top + 'px'});
-
-            //滚动时，实时定位模拟fixed定位效果
-            $(window).scroll(function(){
-                var scrollLeft = $(window).scrollLeft(),
-                    scrollTop = $(window).scrollTop(),
-                    d_left = plugin.dialog_left + scrollLeft,
-                    d_top = plugin.dialog_top + scrollTop;
-
-                plugin.dialog.css({left: d_left + 'px', top: d_top + 'px'});
-
-                if(plugin.settings.dropback){
-                    plugin.backDrop.css({left:scrollLeft, top:scrollTop});
+                        //如果替换成功，结果赋值给plugin.dialog_left
+                        if(tmp1 != p0){
+                            plugin.dialog_left = tmp1;
+                        }
+                    })
                 }
-            })
-            //如果是ie6，到此定位执行完毕
-            return ;
-        }
 
-        //定位非ie6 dialog
-        plugin.dialog.css({left: plugin.dialog_left + 'px', top: plugin.dialog_top + 'px'});
+                //计算top定位
+                if(p_number.test(p1)){
+                    //如果为数值、数值字符串或数值字符串+'px',取数值部分
+                    plugin.dialog_top = parseInt(p1);
+                }else if(p1_expression.test(p1)){
+                    //如果匹配成功，根据values对象替换left,right,center为对应的数值
+                    $.each(values, function(index, value){
+
+                        var tmp2 = p1.replace(index, value);
+
+                        //如果替换成功，结果赋值给plugin.dialog_top
+                        if(tmp2 != p1){
+                            plugin.dialog_top = tmp2;
+                        }
+                    })
+                }
+            }
+
+            //如果用户设置不符合规范或用户没有设置定位，水平定位默认为values.center对应的值; 垂直定位默认为values.middle对应的值
+            plugin.dialog_left = (plugin.dialog_left != undefined)? eval(plugin.dialog_left) : values.center;
+            plugin.dialog_top = (plugin.dialog_top != undefined)? eval(plugin.dialog_top) : values.middle;
+
+            //判断是否为ie6. 如果是ie6,将为dialog及遮罩层做定位的兼容性
+            plugin.isIE6 = ($.browser.msie && parseInt($.browser.version, 10) == 6) || false;
+
+            if(plugin.isIE6){
+                var 
+                    //获取window宽度,ie6 遮罩层100%不能正确获取window宽度兼容
+                    width = $(window).width(),
+                    //获取window高度,ie6 遮罩层100%不能正确获取window高度兼容
+                    height = $(window).height(),
+                    //获取窗口水平滚动距离,兼容ie6 position:fixed定位
+                    scrollLeft = $(window).scrollLeft(),
+                    //获取窗口垂直滚动距离,兼容ie6 position:fixed定位
+                    scrollTop = $(window).scrollTop();
+
+                //ie6下的通过position:absolute；模拟fixed定位。正常水平或垂直距离+滚动距离
+                var ie_dialog_left = plugin.dialog_left + scrollLeft;
+                var ie_dialog_top = plugin.dialog_top + scrollTop;
+
+                //如果有遮罩层，遮罩层定位
+                if(plugin.settings.dropback){
+                    plugin.backDrop.css({width:width, height:height, left:scrollLeft, top:scrollTop});
+                }
+
+                //dialog定位
+                plugin.dialog.css({left: ie_dialog_left + 'px', top: ie_dialog_top + 'px'});
+
+                //滚动时，实时定位模拟fixed定位效果
+                $(window).scroll(function(){
+                    var scrollLeft = $(window).scrollLeft(),
+                        scrollTop = $(window).scrollTop(),
+                        d_left = plugin.dialog_left + scrollLeft,
+                        d_top = plugin.dialog_top + scrollTop;
+
+                    plugin.dialog.css({left: d_left + 'px', top: d_top + 'px'});
+
+                    if(plugin.settings.dropback){
+                        plugin.backDrop.css({left:scrollLeft, top:scrollTop});
+                    }
+                })
+                //如果是ie6，到此定位执行完毕
+                return ;
+            }
+
+            //定位非ie6 dialog
+            plugin.dialog.css({left: plugin.dialog_left + 'px', top: plugin.dialog_top + 'px'});
+        }else{//以触发dialog事件的元素为基准定位dialog
+            var $trigger = position.trigger,
+                top = $trigger.offset().top - plugin.dialog.outerHeight() -5,
+                left = $trigger.offset().left + $trigger.outerWidth() - plugin.dialog.outerWidth();
+
+            if(top < 0){
+                top = $trigger.offset().top + $trigger.outerHeight() +5;
+            }
+            if(left < 0){
+                left = $trigger.offset().left;
+            }
+            plugin.dialog.offset({left:left, top:top});
+        }
     }
 
 /*
@@ -537,7 +552,7 @@
 
         //如果有打开前函数的设置，执行该函数
         if(plugin.settings.prevOpenCallback != undefined && whatType(plugin.settings.prevOpenCallback) == '[object function]'){
-            plugin.settings.prevOpenCallback(plugin.dialog);
+            plugin.settings.prevOpenCallback(plugin);
         }
 
         //如果有遮罩层，显示遮罩层
@@ -546,20 +561,6 @@
         }
         //显示dialog
         plugin.dialog.removeClass('hide');
-
-        //如果需要自动关闭dialog
-        if(plugin.settings.auto_close !== false){
-            //通过闭包保证plugin为正确的实例
-            (function(plugin){
-                //如果用户设置auto_close为数值，则取该值为自动隐藏延迟时间，否则延迟时间为3000
-                var time = parseInt(plugin.auto_close) > 0 ? parseInt(plugin.auto_close) : 3000;
-
-                //延迟自动关闭
-                plugin.timeout = setTimeout(function(){
-                    plugin.close();
-                }, time); 
-            })(plugin)
-        }
 
         //如果需要遮罩层，添加遮罩层到外围元素
         if(plugin.settings.dropback){
@@ -570,10 +571,22 @@
         plugin.settings.wrapper.append(plugin.dialog);
 
         setPosition();
-
+        
         //如果有open的回调函数，执行回调函数
         if(plugin.settings.openCallback != undefined && whatType(plugin.settings.openCallback) == '[object function]'){
-            plugin.settings.openCallback(plugin.dialog);
+            plugin.settings.openCallback(plugin);
+        }
+
+        //如果需要自动关闭dialog
+        if(plugin.settings.auto_close !== false){
+            //通过闭包保证plugin为正确的实例
+            (function(plugin){
+                //如果用户设置auto_close为数值，则取该值为自动隐藏延迟时间，否则延迟时间为3000
+                plugin.displayTime = parseInt(plugin.settings.auto_close) > 0 ? parseInt(plugin.settings.auto_close) : 2000;
+                plugin.timeOut = setTimeout(function(){
+                    plugin.close();
+                },plugin.displayTime)
+            })(plugin)
         }
     }
 
@@ -584,21 +597,38 @@
 
         //如果有关闭前函数的设置，执行该函数
         if(plugin.settings.prevCloseCallback != undefined && whatType(plugin.settings.prevCloseCallback) == '[object function]'){
-            plugin.settings.prevCloseCallback(plugin.dialog);
+            plugin.settings.prevCloseCallback(plugin);
         }
 
-        //从文档移除dialog
-        plugin.dialog.remove();
+        if(plugin.settings.auto_close){
+            plugin.dialog.fadeOut(1000,function(){
+                //从文档移除dialog
+                plugin.dialog.remove();
+                //如果有遮罩层，移除遮罩层
+                if(plugin.settings.dropback){
+                    plugin.backDrop.remove();
+                }
 
-        //如果有遮罩层，移除遮罩层
-        if(plugin.settings.dropback){
-            plugin.backDrop.remove();
-        }
+                //如果有关闭回掉函数，执行回调函数
+                if(plugin.closeCallback != undefined && whatType(plugin.closeCallback) == '[object function]'){
+                    plugin.closeCallback(plugin);
+                }
+            })
+        }else{
+            //从文档移除dialog
+            plugin.dialog.remove();
 
-        //如果有关闭回掉函数，执行回调函数
-        if(plugin.closeCallback != undefined && whatType(plugin.closeCallback) == '[object function]'){
-            plugin.closeCallback(plugin.dialog);
+            //如果有遮罩层，移除遮罩层
+            if(plugin.settings.dropback){
+                plugin.backDrop.remove();
+            }
+
+            //如果有关闭回掉函数，执行回调函数
+            if(plugin.closeCallback != undefined && whatType(plugin.closeCallback) == '[object function]'){
+                plugin.closeCallback(plugin);
+            }
         }
+        
     }
 
 })(window)

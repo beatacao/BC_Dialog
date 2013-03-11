@@ -10,10 +10,14 @@
 <h5>日志：</h5>
 <ol>
 <li>2013.01.22 添加'确认'和'取消'按钮的回调函数参数;可以通过okCallback 和 cancelCallback参数直接设置回调函数；</li>
-<li>2012.01.23 修复dialog_type类型命名；<br />
+<li>2013.01.23 修复dialog_type类型命名；<br />
    dialog_type为'confirm'和'alert'时，添加类：'d-confirm'; <br />
    dialog_type为warning,info,success,error时，添加类：'d-alert' + dialog_type;<br />
    否则添加类为用户设置的dialog_type</li>	
+<li>2013.03.08 修复position中p_number数字验证的正则表达式，支持浮点数</li>
+<li>2013.03.11 添加相对于触发元素的定位</li>
+<li>2013.03.11 优化自动隐藏渐隐效果</li>
+<li>2013.03.11 为在回调函数中使用用户的传参(如$trigger),callback默认参数由原来的plugin.dialog修复为plugin</li>
  </ol>
 </body>
 </html>
