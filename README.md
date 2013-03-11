@@ -10,7 +10,7 @@ Dialog对话框插件
 </p>
 <h5>如何使用：</h5>
 <ol>
-    <li>引入default.min.css</li>
+    <li>引入default.css</li>
     <li>引入最新jquery库及jquery.dialog.min.js</li>
     <li>
         var Dialog = new BC_Dialog({设置的参数...});<br/>
@@ -28,7 +28,7 @@ Dialog对话框插件
     <dd>是否自动关闭dialog; <br/>
         true: 3s后自动关闭dialog; <br/>
         false:不自动关闭; <br/>
-        可自行设置数值，单位ms, 如：2000;<br/>
+        可自行设置数值，单位ms, 如：2000; 该值为显示时间，超出时间自动隐藏<br/>
         默认为false;</dd>
     <dt>* @buttons</dt>       
     <dd>设置dialog底部按钮，<br/>
@@ -68,9 +68,12 @@ Dialog对话框插件
     <dd>boolean,是否设置ESC键关闭dialog, 默认为true</dd>
     <dt>* @position</dt>          
     <dd>设置dialog定位;<br/>
+        如果是相对于父级定位，需要为数组形式：<br />
         水平：left, right, center; 可设置偏移量，如： left - 20; 可直接设置数值：-20 或 -20px;<br/>
         垂直：top, bottom, middle; 可设置偏移量，如：top - 20; 可直接设置数值：-20 或 -20px;<br/>
-        默认居中：['center', 'middle'], 可简写为['center']</dd>
+        默认居中：['center', 'middle'], 可简写为['center']<br />
+        如果是相对于触发元素定位，形式对象：{'trigger':$el}
+    </dd>
     <dt>* @prevOpenCallback</dt>      
     <dd>设置dialog打开前的回调函数;</dd>
     <dt>* @prevCloseCallback</dt>     
@@ -103,3 +106,4 @@ Dialog对话框插件
     <dt>*close</dt>               
     <dd>关闭dialog</dd>
 </dl>
+
