@@ -148,12 +148,17 @@
 
             //如果用户设置了content,添加内容到dialog
             if(ps.content){
-                plugin.setContent(ps.content);
+                //plugin.setContent(ps.content);
+                plugin.dialogBody.html(ps.content);
             }
 
             //如果设置了ajaxUrl,通过ajax方式加载dialog内容
             if(ps.ajaxUrl){
-                plugin.getAjax(ps.ajaxUrl);
+                //plugin.getAjax(ps.ajaxUrl);
+                $.get(ps.ajaxUrl, function(data){
+                    //设置dialog内容
+                    plugin.dialogBody.html(data);
+                })
             }
 
             //如果需要ESC键退出dialog,绑定事件。默认是绑定的。
@@ -469,6 +474,10 @@
             if(left < 0){
                 left = $trigger.offset().left;
             }
+            if($.browser.msie){
+                top = top - $(window).scrollTop();
+                left = left - $(window).scrollLeft();
+            }
             plugin.dialog.offset({left:left, top:top});
         }
     }
@@ -571,7 +580,7 @@
         plugin.settings.wrapper.append(plugin.dialog);
 
         setPosition();
-        
+
         //如果有open的回调函数，执行回调函数
         if(plugin.settings.openCallback != undefined && whatType(plugin.settings.openCallback) == '[object function]'){
             plugin.settings.openCallback(plugin);
@@ -582,12 +591,12 @@
             //通过闭包保证plugin为正确的实例
             (function(plugin){
                 //如果用户设置auto_close为数值，则取该值为自动隐藏延迟时间，否则延迟时间为3000
-                plugin.displayTime = parseInt(plugin.settings.auto_close) > 0 ? parseInt(plugin.settings.auto_close) : 2000;
+                plugin.displayTime = parseInt(plugin.settings.auto_close) > 0 ? parseInt(plugin.settings.auto_close) : 500;
                 plugin.timeOut = setTimeout(function(){
                     plugin.close();
                 },plugin.displayTime)
             })(plugin)
-        }
+        } 
     }
 
     /*关闭对话框*/
